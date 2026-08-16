@@ -3,6 +3,7 @@ package ru.home.etocalc.domain.model.catalog;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Table(name = "catalog_cables")
@@ -54,6 +55,13 @@ public class Cable {
         if (this.cableType == null) {
             return "Неизвестный кабель";
         }
-        return this.cableType.getName() + " " + this.conductorCount + "x" + this.crossSection + "-" + (this.nominalVoltage / 1000.0);
+
+        String section = this.crossSection.stripTrailingZeros().toPlainString();
+        String voltage = BigDecimal.valueOf(this.nominalVoltage)
+                .divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP)
+                .stripTrailingZeros()
+                .toPlainString();
+
+        return this.cableType.getName() + " " + this.conductorCount + "×" + section + "-" + voltage;
     }
 }
