@@ -1,55 +1,48 @@
 -- ========================================
 -- 1. ПРОВОДНИКИ
 -- ========================================
-WITH conductor_base AS (
-    INSERT INTO materials (name, material_type)
-    VALUES ('Медь', 'CONDUCTOR'), ('Алюминий', 'CONDUCTOR')
-    ON CONFLICT (name, material_type) DO NOTHING
-    RETURNING id, name
-),
-conductor_map AS (
-    SELECT id, CASE name WHEN 'Медь' THEN 0.0175 WHEN 'Алюминий' THEN 0.0280 END AS resistivity
-    FROM conductor_base
-)
+INSERT INTO materials (name, material_type) VALUES
+('Медь', 'CONDUCTOR'),
+('Алюминий', 'CONDUCTOR');
+
 INSERT INTO conductor_materials (id, resistivity)
-SELECT id, resistivity FROM conductor_map ON CONFLICT (id) DO NOTHING;
+SELECT id,
+       CASE name
+       WHEN 'Медь' THEN 0.0175
+       WHEN 'Алюминий' THEN 0.0280
+       END
+FROM materials
+WHERE material_type = 'CONDUCTOR';
 
 -- ========================================
 -- 2. ИЗОЛЯЦИЯ
 -- ========================================
-WITH insulation_base AS (
-    INSERT INTO materials (name, material_type)
-    VALUES ('ПВХ пластикат', 'INSULATION'),
-           ('ПВХ пластикат пониженной пожарной опасности', 'INSULATION'),
-           ('Сшитый полиэтилен', 'INSULATION')
-    ON CONFLICT (name, material_type) DO NOTHING
-    RETURNING id, name
-),
-insulation_map AS (
-    SELECT id,
-           CASE name WHEN 'Сшитый полиэтилен' THEN 90 ELSE 70 END AS temp_normal,
-           CASE name WHEN 'Сшитый полиэтилен' THEN 130 ELSE 90 END AS temp_overload,
-           CASE name WHEN 'Сшитый полиэтилен' THEN 250 ELSE 160 END AS temp_short_circuit,
-           CASE name WHEN 'Сшитый полиэтилен' THEN 400 ELSE 350 END AS temp_ignition
-    FROM insulation_base
-)
+INSERT INTO materials (name, material_type) VALUES
+('ПВХ пластикат', 'INSULATION'),
+('ПВХ пластикат пониженной пожарной опасности', 'INSULATION'),
+('Сшитый полиэтилен', 'INSULATION');
+
 INSERT INTO insulation_materials (id, temp_normal, temp_overload, temp_short_circuit, temp_ignition)
-SELECT id, temp_normal, temp_overload, temp_short_circuit, temp_ignition
-FROM insulation_map ON CONFLICT (id) DO NOTHING;
+SELECT id,
+       CASE name WHEN 'Сшитый полиэтилен' THEN 90  ELSE 70  END,
+       CASE name WHEN 'Сшитый полиэтилен' THEN 130 ELSE 90  END,
+       CASE name WHEN 'Сшитый полиэтилен' THEN 250 ELSE 160 END,
+       CASE name WHEN 'Сшитый полиэтилен' THEN 400 ELSE 350 END
+FROM materials
+WHERE material_type = 'INSULATION';
 
 -- ========================================
 -- 3. ОБОЛОЧКА
 -- ========================================
-WITH sheath_base AS (
-    INSERT INTO materials (name, material_type)
-    VALUES ('ПВХ пластикат', 'SHEATH'),
-           ('ПВХ пластикат пониженной пожарной опасности', 'SHEATH'),
-           ('Сшитый полиэтилен', 'SHEATH')
-    ON CONFLICT (name, material_type) DO NOTHING
-    RETURNING id
-)
+INSERT INTO materials (name, material_type) VALUES
+('ПВХ пластикат', 'SHEATH'),
+('ПВХ пластикат пониженной пожарной опасности', 'SHEATH'),
+('Сшитый полиэтилен', 'SHEATH');
+
 INSERT INTO sheath_materials (id)
-SELECT id FROM sheath_base ON CONFLICT (id) DO NOTHING;
+SELECT id
+FROM materials
+WHERE material_type = 'SHEATH';
 
 -- ========================================
 -- 4. ТИП КАБЕЛЯ: ВВГнг(А)-LS
@@ -60,11 +53,7 @@ SELECT
     (SELECT id FROM materials WHERE name = 'Медь' AND material_type = 'CONDUCTOR'),
     (SELECT id FROM materials WHERE name = 'ПВХ пластикат пониженной пожарной опасности' AND material_type = 'INSULATION'),
     (SELECT id FROM materials WHERE name = 'ПВХ пластикат пониженной пожарной опасности' AND material_type = 'SHEATH'),
-    false
-ON CONFLICT (name) DO UPDATE SET
-    conductor_material_id = EXCLUDED.conductor_material_id,
-    insulation_material_id = EXCLUDED.insulation_material_id,
-    sheath_material_id = EXCLUDED.sheath_material_id;
+    false;
 
 -- ========================================
 -- 5. СПЕЦИФИКАЦИИ КАБЕЛЕЙ ВВГнг(А)-LS
@@ -98,5 +87,4 @@ FROM (VALUES
     (1000, 5, 70.0,  0.268,  0.268, 0.075, 0.075, 196, 215),
     (1000, 5, 95.0,  0.193,  0.193, 0.075, 0.075, 243, 259),
     (1000, 5, 120.0, 0.153,  0.153, 0.075, 0.075, 281, 295)
-) AS v(voltage, cores, section, r_ph, r0_ph, x_ph, x0_ph, i_air, i_earth)
-ON CONFLICT DO NOTHING;
+) AS v(voltage, cores, section, r_ph, r0_ph, x_ph, x0_ph, i_air, i_earth);
