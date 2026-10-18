@@ -36,3 +36,17 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Build
+build/
+.gradle/
+
+# IDE
+.idea/
+*.iml
+amplicode.xml
+
+# H2 database files
+data/
+*.mv.db
+*.trace.db

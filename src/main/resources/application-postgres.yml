@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: etocalc
+  datasource:
+    url: jdbc:postgresql://localhost:5432/etocalcdb
+    username: ksenos
+    password: k234_oS
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
