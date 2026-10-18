@@ -1,8 +1,11 @@
 package ru.home.etocalc.api.dto.response;
 
+import java.util.List;
+
 public record VoltageDropResponse(
-        String cableName,              // Полное имя кабеля
-        Double deltaUVolts,            // Потеря напряжения, В
-        Double deltaUPercent,          // Потеря напряжения, %
-        Double endVoltage             // Напряжение в конце линии, В
+        String cableName,
+        Double deltaUVolts,
+        Double deltaUPercent,
+        Double endVoltage,
+        List<CalculationStep> steps
 ) {}

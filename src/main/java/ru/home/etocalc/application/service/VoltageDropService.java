@@ -1,6 +1,5 @@
 package ru.home.etocalc.application.service;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.home.etocalc.api.dto.request.VoltageDropRequest;
@@ -9,6 +8,7 @@ import ru.home.etocalc.calculator.voltagedrop.AmbientCondition;
 import ru.home.etocalc.calculator.voltagedrop.VoltageDropCalculator;
 import ru.home.etocalc.calculator.voltagedrop.VoltageDropInput;
 import ru.home.etocalc.calculator.voltagedrop.VoltageDropResult;
+import ru.home.etocalc.calculator.voltagedrop.VoltageDropTrace;
 import ru.home.etocalc.domain.model.catalog.Cable;
 import ru.home.etocalc.domain.model.catalog.ConductorMaterial;
 import ru.home.etocalc.infrastructure.persistence.repository.CableRepository;
@@ -34,7 +34,6 @@ public class VoltageDropService {
         Cable cable = cableRepository.findByIdWithAllMaterials(request.sourceId())
                 .orElseThrow(() -> new IllegalArgumentException("Кабель с ID " + request.sourceId() + " не найден"));
 
-        // Валидация напряжения
         if (request.networkVoltage() > cable.getNominalVoltage()) {
             throw new IllegalArgumentException(
                     String.format("Напряжение сети (%.0f В) превышает номинал кабеля (%d В)",
@@ -42,7 +41,6 @@ public class VoltageDropService {
             );
         }
 
-        // Определяем температурный коэффициент по материалу жилы
         BigDecimal tempCoefficient = getTemperatureCoefficient(cable.getCableType().getConductorMaterial());
 
         VoltageDropInput input = new VoltageDropInput(
@@ -59,13 +57,15 @@ public class VoltageDropService {
                 new AmbientCondition(BigDecimal.valueOf(request.ambientTemperature()))
         );
 
-        VoltageDropResult result = calculator.calculate(input);
+        VoltageDropTrace traceResult = calculator.calculateWithTrace(input);
+        VoltageDropResult result = traceResult.result();
 
         return new VoltageDropResponse(
                 cable.getFullName(),
                 result.deltaUVolts().doubleValue(),
                 result.deltaUPercent().doubleValue(),
-                result.endVoltage().doubleValue()
+                result.endVoltage().doubleValue(),
+                traceResult.trace().getSteps()
         );
     }
 
