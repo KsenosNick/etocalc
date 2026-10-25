@@ -7,5 +7,6 @@ public record VoltageDropResponse(
         Double deltaUVolts,
         Double deltaUPercent,
         Double endVoltage,
+        Double targetVoltage,
         List<CalculationStep> steps
 ) {}

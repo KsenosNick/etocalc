@@ -30,6 +30,8 @@ public class CalculationController {
     public VoltageDropResponse demoVoltageDrop(
             @RequestParam(defaultValue = "0") Long cableId,
             @RequestParam(required = false) Double networkVoltage,
+            @RequestParam(required = false) Double targetVoltage,
+            @RequestParam(required = false) Double power,          // <-- НОВОЕ
             @RequestParam(defaultValue = "16.0") Double current,
             @RequestParam(defaultValue = "50.0") Double length,
             @RequestParam(defaultValue = "0.9") Double cosPhi,
@@ -45,16 +47,21 @@ public class CalculationController {
                 ? cables.stream().filter(c -> c.getId().equals(cableId)).findFirst().orElse(cables.get(10))
                 : cables.get(10);
 
-        // Умное определение напряжения, если не передано
-        double voltage = networkVoltage != null
+        double srcVoltage = networkVoltage != null
                 ? networkVoltage
                 : (cable.getConductorCount() <= 3 ? 230.0 : 400.0);
+
+        double tgtVoltage = targetVoltage != null
+                ? targetVoltage
+                : (srcVoltage >= 380.0 ? 380.0 : 220.0);
 
         VoltageDropRequest request = new VoltageDropRequest(
                 CalculationSourceType.CABLE,
                 cable.getId(),
-                voltage,
+                srcVoltage,
+                tgtVoltage,
                 current,
+                power,
                 length,
                 cosPhi,
                 ambientTemperature,
@@ -62,22 +69,5 @@ public class CalculationController {
         );
 
         return voltageDropService.calculate(request);
-    }
-
-    @Nonnull
-    private static VoltageDropRequest createVoltageDropRequest(Cable cable) {
-        double defaultNetworkVoltage = (cable.getConductorCount() <= 3) ? 230.0 : 400.0;
-
-        VoltageDropRequest request = new VoltageDropRequest(
-                CalculationSourceType.CABLE,
-                cable.getId(),
-                defaultNetworkVoltage, // 230В или 400В
-                16.0,                  // 16 А
-                50.0,                  // 50 м
-                0.9,                   // cosφ
-                30.0,                  // 30°C
-                1                      // 1 кабель
-        );
-        return request;
     }
 }

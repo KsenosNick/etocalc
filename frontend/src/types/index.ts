@@ -27,7 +27,9 @@ export interface VoltageDropRequest {
   sourceType: CalculationSourceType
   sourceId: number
   networkVoltage: number
+  targetVoltage: number
   current: number
+  power?: number
   length: number
   cosPhi: number
   ambientTemperature: number
@@ -49,5 +51,6 @@ export interface VoltageDropResponse {
   deltaUVolts: number
   deltaUPercent: number
   endVoltage: number
+  targetVoltage: number
   steps: CalculationStep[]
 }

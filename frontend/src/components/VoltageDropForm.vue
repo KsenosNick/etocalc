@@ -5,13 +5,14 @@
       <form @submit.prevent="handleSubmit" class="form">
         <CableSelector @select="handleCableSelect" />
 
+        <!-- Ряд 1: Напряжения -->
         <div class="form-row">
           <div class="form-field">
-            <label for="networkVoltage">Напряжение сети, В</label>
+            <label for="networkVoltage">Напряжение в начале участка, В</label>
             <InputNumber
               id="networkVoltage"
               v-model="form.networkVoltage"
-              :min="0"
+              :min="10"
               :max="1000"
               :step="10"
               class="w-full"
@@ -19,18 +20,82 @@
           </div>
 
           <div class="form-field">
-            <label for="current">Ток, А</label>
+            <label for="targetVoltage">Номинальное напряжение потребителя, В</label>
             <InputNumber
-              id="current"
-              v-model="form.current"
-              :min="0"
+              id="targetVoltage"
+              v-model="form.targetVoltage"
+              :min="10"
               :max="1000"
-              :step="0.1"
+              :step="10"
               class="w-full"
             />
           </div>
         </div>
 
+        <!-- Ряд 2: Переключатель режима -->
+        <div class="mode-switcher">
+          <Button
+            :label="'Ток (А)'"
+            :severity="inputMode === 'current' ? 'primary' : 'secondary'"
+            size="small"
+            @click="inputMode = 'current'"
+            class="mode-btn"
+          />
+          <Button
+            :label="'Мощность (кВт)'"
+            :severity="inputMode === 'power' ? 'primary' : 'secondary'"
+            size="small"
+            @click="inputMode = 'power'"
+            class="mode-btn"
+          />
+        </div>
+
+        <!-- Ряд 3: Ток / Мощность и расчётное поле -->
+        <div class="form-row">
+          <!-- Активное поле ввода -->
+          <div v-if="inputMode === 'current'" class="form-field">
+            <label for="current">Ток нагрузки, А</label>
+            <InputNumber
+              id="current"
+              v-model="form.current"
+              :min="0.1"
+              :max="10000"
+              :step="0.1"
+              :minFractionDigits="1"
+              :maxFractionDigits="2"
+              class="w-full"
+            />
+          </div>
+
+          <div v-else class="form-field">
+            <label for="power">Активная мощность, кВт</label>
+            <InputNumber
+              id="power"
+              v-model="form.power"
+              :min="0.1"
+              :max="10000"
+              :step="0.1"
+              :minFractionDigits="1"
+              :maxFractionDigits="2"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Расчётное поле (всегда справа) -->
+          <div class="form-field">
+            <label>{{ inputMode === 'current' ? 'Мощность (расч.)' : 'Ток (расч.)' }}</label>
+            <InputNumber
+              :modelValue="inputMode === 'current' ? form.power : form.current"
+              readonly
+              disabled
+              :minFractionDigits="2"
+              :maxFractionDigits="2"
+              class="w-full calculated-field"
+            />
+          </div>
+        </div>
+
+        <!-- Ряд 4: Длина и cosφ -->
         <div class="form-row">
           <div class="form-field">
             <label for="length">Длина линии, м</label>
@@ -59,6 +124,7 @@
           </div>
         </div>
 
+        <!-- Ряд 5: Температура и параллельные кабели -->
         <div class="form-row">
           <div class="form-field">
             <label for="ambientTemperature">Температура, °C</label>
@@ -99,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import Card from 'primevue/card'
 import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
@@ -111,39 +177,78 @@ const emit = defineEmits<{
   (e: 'calculate', request: VoltageDropRequest): void
 }>()
 
-defineProps<{
-  loading: boolean
-}>()
+defineProps<{ loading: boolean }>()
 
 const selectedCable = ref<Cable | null>(null)
 
+const inputMode = ref<'current' | 'power'>('current')
+
 const form = ref({
   networkVoltage: 230,
+  targetVoltage: 220,
   current: 16,
+  power: 3.3,
   length: 50,
   cosPhi: 0.9,
-  ambientTemperature: 20,
+  ambientTemperature: 25,
   parallelCableCount: 1,
 })
 
 function handleCableSelect(cable: Cable | null) {
   selectedCable.value = cable
-
-  // Умное определение напряжения сети
   if (cable) {
-    form.value.networkVoltage = cable.conductorCount <= 3 ? 230 : 400
+    const isThreePhase = cable.conductorCount > 3
+    form.value.networkVoltage = isThreePhase ? 400 : 230
+    form.value.targetVoltage = isThreePhase ? 380 : 220
+
+    recalculatePowerFromCurrent()
   }
 }
 
+// Формулы пересчёта
+function recalculatePowerFromCurrent() {
+  const u = form.value.networkVoltage / 1000
+  const is3ph = form.value.networkVoltage >= 380
+  const k = is3ph ? Math.sqrt(3) : 1
+  form.value.power = parseFloat((k * u * form.value.current * form.value.cosPhi).toFixed(2))
+}
+
+function recalculateCurrentFromPower() {
+  const u = form.value.networkVoltage / 1000
+  const is3ph = form.value.networkVoltage >= 380
+  const k = is3ph ? Math.sqrt(3) : 1
+  form.value.current = parseFloat((form.value.power! / (k * u * form.value.cosPhi)).toFixed(2))
+}
+
+// Watchers для автоматического пересчёта
+watch(
+  () => [form.value.current, form.value.networkVoltage, form.value.cosPhi],
+  () => {
+    if (inputMode.value === 'current') recalculatePowerFromCurrent()
+  },
+)
+
+watch(
+  () => [form.value.power, form.value.networkVoltage, form.value.cosPhi],
+  () => {
+    if (inputMode.value === 'power') recalculateCurrentFromPower()
+  },
+)
+
 function handleSubmit() {
-  if (!selectedCable.value) {
-    return
-  }
+  if (!selectedCable.value) return
 
   const request: VoltageDropRequest = {
     sourceType: CalculationSourceType.CABLE,
     sourceId: selectedCable.value.id,
-    ...form.value,
+    networkVoltage: form.value.networkVoltage,
+    targetVoltage: form.value.targetVoltage,
+    current: form.value.current, // Всегда отправляем ток
+    power: inputMode.value === 'power' ? form.value.power : undefined,
+    length: form.value.length,
+    cosPhi: form.value.cosPhi,
+    ambientTemperature: form.value.ambientTemperature,
+    parallelCableCount: form.value.parallelCableCount,
   }
 
   emit('calculate', request)

@@ -1,13 +1,16 @@
 <template>
   <div>
     <header class="app-header">
-      <div class="header-content">
+      <div class="header-left">
         <h1>⚡ Электротехнический калькулятор</h1>
+      </div>
+      <div class="header-right">
         <Button
           :icon="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"
           @click="toggleTheme"
           severity="secondary"
           rounded
+          text
           v-tooltip="isDarkMode ? 'Светлая тема' : 'Тёмная тема'"
         />
       </div>
@@ -82,13 +85,23 @@ body {
 
 .app-header {
   background-color: var(--surface-card);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  justify-content: space-between; /* ← РАЗНОСИМ ЭЛЕМЕНТЫ ПО КРАЯМ */
+  align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
+.header-left h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
 .header-content {
   max-width: 1400px;
   margin: 0 auto;
@@ -103,8 +116,10 @@ body {
 }
 
 .app-main {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  height: calc(100vh - 60px);
+  overflow: hidden;
 }
 </style>

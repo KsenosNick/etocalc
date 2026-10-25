@@ -13,7 +13,7 @@
         </div>
 
         <div class="result-metrics">
-          <div class="metric" :class="getSeverityClass(result.deltaUPercent)">
+          <div class="metric" :class="getSeverityClass(result.endVoltage, result.targetVoltage)">
             <div class="metric-label">Потеря напряжения</div>
             <div class="metric-value">{{ result.deltaUPercent.toFixed(2) }}%</div>
             <div class="metric-detail">{{ result.deltaUVolts.toFixed(2) }} В</div>
@@ -22,15 +22,18 @@
           <div class="metric">
             <div class="metric-label">Напряжение в конце линии</div>
             <div class="metric-value">{{ result.endVoltage.toFixed(1) }} В</div>
+            <div class="metric-detail" style="font-size: 0.8rem; margin-top: 4px">
+              (цель: {{ result.targetVoltage }} В)
+            </div>
           </div>
         </div>
 
         <div class="result-assessment">
           <Message
-            :severity="getSeverity(result.deltaUPercent)"
-            :icon="getIcon(result.deltaUPercent)"
+            :severity="getSeverity(result.endVoltage, result.targetVoltage)"
+            :icon="getIcon(result.endVoltage, result.targetVoltage)"
           >
-            {{ getAssessment(result.deltaUPercent) }}
+            {{ getAssessment(result.endVoltage, result.targetVoltage) }}
           </Message>
         </div>
       </div>
@@ -54,28 +57,39 @@ defineProps<{
   loading: boolean
 }>()
 
-function getSeverity(percent: number): 'success' | 'warn' | 'error' {
-  if (percent <= 3) return 'success'
-  if (percent <= 5) return 'warn'
+function getDeviationPercent(endV: number, targetV: number): number {
+  return (Math.abs(endV - targetV) / targetV) * 100
+}
+
+function getSeverity(endV: number, targetV: number): 'success' | 'warn' | 'error' {
+  const dev = getDeviationPercent(endV, targetV)
+  if (dev <= 5) return 'success'
+  if (dev <= 10) return 'warn'
   return 'error'
 }
 
-function getSeverityClass(percent: number): string {
-  if (percent <= 3) return 'severity-success'
-  if (percent <= 5) return 'severity-warning'
+function getSeverityClass(endV: number, targetV: number): string {
+  const dev = getDeviationPercent(endV, targetV)
+  if (dev <= 5) return 'severity-success'
+  if (dev <= 10) return 'severity-warning'
   return 'severity-error'
 }
 
-function getIcon(percent: number): string {
-  if (percent <= 3) return 'pi pi-check-circle'
-  if (percent <= 5) return 'pi pi-exclamation-triangle'
+function getIcon(endV: number, targetV: number): string {
+  const dev = getDeviationPercent(endV, targetV)
+  if (dev <= 5) return 'pi pi-check-circle'
+  if (dev <= 10) return 'pi pi-exclamation-triangle'
   return 'pi pi-times-circle'
 }
 
-function getAssessment(percent: number): string {
-  if (percent <= 3) return 'Отлично! Потери в пределах нормы (≤3% для осветительных сетей)'
-  if (percent <= 5) return 'Допустимо. Потери в пределах 5% (норма для силовых сетей)'
-  return 'Превышение нормы! Рекомендуется увеличить сечение кабеля или уменьшить длину линии'
+function getAssessment(endV: number, targetV: number): string {
+  const dev = getDeviationPercent(endV, targetV)
+  const direction = endV < targetV ? 'понижено' : 'повышено'
+
+  if (dev <= 5) {
+    return `Отлично! Напряжение в норме (${endV.toFixed(1)} В). Отклонение от номинала (${targetV} В) составляет всего ${dev.toFixed(1)}%.`
+  }
+  return `Превышение нормы! Напряжение ${direction} (${endV.toFixed(1)} В). Отклонение от номинала (${targetV} В) составляет ${dev.toFixed(1)}%.`
 }
 </script>
 

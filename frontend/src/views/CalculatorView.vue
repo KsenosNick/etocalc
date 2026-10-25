@@ -23,7 +23,7 @@ import { ref } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import VoltageDropForm from '../components/VoltageDropForm.vue'
 import VoltageDropResult from '../components/VoltageDropResult.vue'
-import CalculationSteps from '../components/CalculationSteps.vue'
+import CalculationSteps from '../components/CalculationSteps.vue' // <-- Импорт здесь
 import { calculateVoltageDrop } from '../api/calculations'
 import type { VoltageDropRequest, VoltageDropResponse } from '../types'
 

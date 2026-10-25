@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Фон калькулятора (на заднем плане) -->
+  <rect x="16" y="16" width="36" height="40" rx="4" fill="#3b82f6" opacity="0.3"/>
+  <rect x="20" y="20" width="28" height="10" rx="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="24" cy="36" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="32" cy="36" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="40" cy="36" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="24" cy="44" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="32" cy="44" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="40" cy="44" r="2" fill="#ffffff" opacity="0.8"/>
+  
+  <!-- Молния (на переднем плане) -->
+  <path d="M34 8 L14 34 L28 34 L26 56 L50 26 L34 26 Z" fill="#fbbf24" stroke="#000000" stroke-width="2" stroke-linejoin="round"/>
+</svg>

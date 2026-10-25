@@ -11,9 +11,9 @@ import java.text.DecimalFormat;
 @Component
 public class VoltageDropCalculator {
 
-    private static final BigDecimal TWENTY = new BigDecimal("20");
-    private static final BigDecimal THOUSAND = new BigDecimal("1000");
-    private static final BigDecimal HUNDRED = new BigDecimal("100");
+    private static final BigDecimal REF_TEMP_C = new BigDecimal("20");
+    private static final BigDecimal M_PER_KM = new BigDecimal("1000");
+    private static final BigDecimal PCT_FACTOR = new BigDecimal("100");
 
     private static final DecimalFormat FORMAT = new DecimalFormat("#.######");
 
@@ -25,7 +25,8 @@ public class VoltageDropCalculator {
         CalculationTrace trace = new CalculationTrace();
 
         // 1. Корректировка сопротивления по температуре
-        BigDecimal tempDelta = input.ambientCondition().temperature().subtract(TWENTY);
+        BigDecimal tempDelta = input.ambientCondition().temperature().subtract(REF_TEMP_C);
+
         trace.addStep("temp_delta", "Разница температур",
                 "Δt = t − 20",
                 fmt(input.ambientCondition().temperature()) + " − 20",
@@ -41,24 +42,24 @@ public class VoltageDropCalculator {
         trace.addStep("r_adjusted", "Активное сопротивление при рабочей температуре",
                 "rT = r20·kT",
                 fmt(input.rPhActive()) + "·" + fmt(tempFactor),
-                fmt(rPhActiveAdjusted), "мОм/м");
+                fmt(rPhActiveAdjusted), "Ом/км"); // <-- ИСПРАВЛЕНО: было "мОм/м"
 
         // 2. Учёт параллельных кабелей
         BigDecimal parallelCount = new BigDecimal(input.parallelCableCount());
-        BigDecimal rEffective = rPhActiveAdjusted.divide(parallelCount, MathContext.DECIMAL64);
-        trace.addStep("r_effective", "Эффективное активное сопротивление",
-                "rэф = rT / n",
+        BigDecimal rEq = rPhActiveAdjusted.divide(parallelCount, MathContext.DECIMAL64);
+        trace.addStep("r_экв", "Эквивалентное активное сопротивление линии",
+                "r_кл = rT / n",
                 fmt(rPhActiveAdjusted) + " / " + fmt(parallelCount),
-                fmt(rEffective), "мОм/м");
+                fmt(rEq), "Ом/км");
 
-        BigDecimal xEffective = input.xPhReactive().divide(parallelCount, MathContext.DECIMAL64);
-        trace.addStep("x_effective", "Эффективное реактивное сопротивление",
-                "xэф = x / n",
+        BigDecimal xEq = input.xPhReactive().divide(parallelCount, MathContext.DECIMAL64);
+        trace.addStep("x_экв", "Эквивалентное реактивное сопротивление линии",
+                "x_кл = x / n",
                 fmt(input.xPhReactive()) + " / " + fmt(parallelCount),
-                fmt(xEffective), "Ом/км");
+                fmt(xEq), "Ом/км");
 
         // 3. Единицы измерения
-        BigDecimal lengthKm = input.length().divide(THOUSAND, MathContext.DECIMAL64);
+        BigDecimal lengthKm = input.length().divide(M_PER_KM, MathContext.DECIMAL64);
         trace.addStep("length_km", "Длина в километрах",
                 "Lкм = L / 1000",
                 fmt(input.length()) + " / 1000",
@@ -68,20 +69,20 @@ public class VoltageDropCalculator {
         double cosPhi = input.cosPhi().doubleValue();
         double sinPhi = Math.sqrt(1.0 - (cosPhi * cosPhi));
         BigDecimal sinPhiBd = BigDecimal.valueOf(sinPhi);
-        trace.addStep("sin_phi", "Реактивная составляющая",
+        trace.addStep("sin_phi", "sinφ",
                 "sinφ = √(1 − cosφ²)",
                 "√(1 − " + fmt(input.cosPhi()) + "²)",
                 fmt(sinPhiBd), "");
 
         // 5. Расчёт ΔU в Вольтах
-        BigDecimal rPart = rEffective.multiply(input.cosPhi());
-        BigDecimal xPart = xEffective.multiply(sinPhiBd);
+        BigDecimal rPart = rEq.multiply(input.cosPhi());
+        BigDecimal xPart = xEq.multiply(sinPhiBd);
         BigDecimal impedancePart = rPart.add(xPart);
 
-        trace.addStep("impedance_part", "Импедансная составляющая",
-                "Z = rэф·cosφ + xэф·sinφ",
-                fmt(rEffective) + "·" + fmt(input.cosPhi()) + " + " + fmt(xEffective) + "·" + fmt(sinPhiBd),
-                fmt(impedancePart), "мОм/км");
+        trace.addStep("impedance_part", "Расчётная величина сопротивления",
+                "Z = r_кл·cosφ + x_кл·sinφ",
+                fmt(rEq) + "·" + fmt(input.cosPhi()) + " + " + fmt(xEq) + "·" + fmt(sinPhiBd),
+                fmt(impedancePart), "Ом/км");
 
         BigDecimal deltaU = input.getSystemFactor()
                 .multiply(input.current())
@@ -98,7 +99,7 @@ public class VoltageDropCalculator {
 
         // 6. Расчёт ΔU в % и конечного напряжения
         BigDecimal deltaUPct = deltaU
-                .multiply(HUNDRED)
+                .multiply(PCT_FACTOR)
                 .divide(input.networkVoltage(), 4, RoundingMode.HALF_UP);
         trace.addStep("delta_u_percent", "Потеря напряжения в процентах",
                 "ΔU% = ΔU·100 / Uсети",
