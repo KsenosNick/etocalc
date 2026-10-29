@@ -259,34 +259,59 @@ function handleSubmit() {
 .form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
 }
 
 .form-field {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .form-field label {
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .submit-button {
   width: 100%;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--text-lg);
+  margin-top: var(--spacing-sm);
 }
 
 .w-full {
   width: 100%;
+}
+
+.mode-switcher {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  margin-top: calc(var(--spacing-sm) * -1);
+}
+
+.mode-btn {
+  flex: 1;
+}
+
+.calculated-field :deep(input) {
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: var(--text-xs);
+  color: var(--text-color);
+  opacity: 0.6;
+  margin-top: var(--spacing-xs);
 }
 </style>

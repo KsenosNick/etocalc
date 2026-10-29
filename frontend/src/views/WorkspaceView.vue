@@ -23,7 +23,7 @@
         <Tab value="catalog">
           <!-- Иконка: Справочники (База данных) -->
           <IconCatalog />
-          <span>Справочники</span>
+          <span>База данных</span>
         </Tab>
       </TabList>
 
@@ -93,12 +93,11 @@ const activeTab = ref('voltage-drop') // По умолчанию открыва�
 <style scoped>
 .workspace {
   width: 100%;
-  height: calc(100vh - 80px); /* Вычитаем высоту хедера App.vue */
+  height: calc(100vh - var(--header-height));
   display: flex;
   flex-direction: column;
 }
 
-/* Стилизация под ленту (Ribbon) */
 .ribbon-tabs {
   width: 100%;
   height: 100%;
@@ -109,7 +108,7 @@ const activeTab = ref('voltage-drop') // По умолчанию открыва�
 :deep(.p-tablist) {
   background-color: var(--surface-card);
   border-bottom: 1px solid var(--border-color);
-  padding: 0 1rem;
+  padding: 0 var(--spacing-md);
 }
 
 :deep(.p-tab) {
@@ -118,12 +117,12 @@ const activeTab = ref('voltage-drop') // По умолчанию открыва�
   color: var(--text-color);
   opacity: 0.7;
   font-weight: 500;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px 6px 0 0;
-  transition: all 0.2s;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+  transition: all var(--transition-base);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 :deep(.p-tab:hover) {
@@ -135,14 +134,14 @@ const activeTab = ref('voltage-drop') // По умолчанию открыва�
   background-color: var(--surface-ground);
   color: var(--text-color);
   opacity: 1;
-  border-bottom: 2px solid var(--surface-ground); /* Перекрывает границу TabList */
+  border-bottom: 2px solid var(--surface-ground);
   margin-bottom: -1px;
 }
 
 :deep(.p-tabpanels) {
   flex: 1;
   background-color: var(--surface-ground);
-  padding: 1.5rem;
+  padding: var(--spacing-lg);
   overflow-y: auto;
 }
 
@@ -158,18 +157,18 @@ const activeTab = ref('voltage-drop') // По умолчанию открыва�
 }
 
 .placeholder-panel h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--text-2xl);
 }
 
 .placeholder-panel .hint {
-  margin-top: 1rem;
-  font-size: 0.9rem;
+  margin-top: var(--spacing-md);
+  font-size: var(--text-sm);
   color: var(--text-color);
   opacity: 0.6;
   background-color: var(--surface-card);
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
   border: 1px solid var(--border-color);
 }
 </style>

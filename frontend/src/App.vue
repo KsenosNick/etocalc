@@ -53,73 +53,37 @@ function toggleTheme() {
 }
 </script>
 
-<style>
-:root {
-  --surface-ground: #f8f9fa;
-  --surface-card: #ffffff;
-  --text-color: #495057;
-  --border-color: #dee2e6;
-}
-
-/* Применяем тёмную тему к корневому элементу <html> */
-html.dark-mode {
-  --surface-ground: #121212;
-  --surface-card: #1e1e1e;
-  --text-color: #ffffffde;
-  --border-color: #333333;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: var(--surface-ground);
-  color: var(--text-color);
-  transition:
-    background-color 0.3s,
-    color 0.3s;
-}
-
+<style scoped>
 .app-header {
   background-color: var(--surface-card);
   border-bottom: 1px solid var(--border-color);
-  padding: 0 2rem;
-  height: 60px;
+  padding: 0 var(--spacing-xl);
+  height: var(--header-height);
   display: flex;
-  justify-content: space-between; /* ← РАЗНОСИМ ЭЛЕМЕНТЫ ПО КРАЯМ */
+  justify-content: space-between;
   align-items: center;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: var(--z-sticky);
 }
 
 .header-left h1 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 600;
   color: var(--text-color);
 }
-.header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.header-content h1 {
-  margin: 0;
-  font-size: 1.5rem;
+.header-right {
+  display: flex;
+  align-items: center;
 }
 
 .app-main {
   max-width: 100%;
   margin: 0;
   padding: 0;
-  height: calc(100vh - 60px);
+  height: calc(100vh - var(--header-height));
   overflow: hidden;
 }
 </style>

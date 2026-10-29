@@ -63,12 +63,12 @@ function handleSelect(cable: (Cable & { fullName: string }) | null) {
 .cable-selector {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .cable-selector label {
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
 }
 
 .cable-option {
@@ -76,12 +76,12 @@ function handleSelect(cable: (Cable & { fullName: string }) | null) {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0.5rem 0;
+  padding: var(--spacing-sm) 0;
 }
 
 .cable-specs {
-  color: #666;
-  font-size: 0.85rem;
+  color: var(--color-gray-500);
+  font-size: var(--text-xs);
 }
 
 .w-full {

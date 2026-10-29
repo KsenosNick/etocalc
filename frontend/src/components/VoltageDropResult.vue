@@ -109,69 +109,70 @@ function getAssessment(endV: number, targetV: number): string {
 .loading i,
 .empty i {
   font-size: 3rem;
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-md);
 }
 
 .result {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--spacing-lg);
 }
 
 .result-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--text-lg);
   color: var(--text-color);
 }
 
 .result-metrics {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: var(--spacing-md);
 }
 
 .metric {
-  padding: 1rem;
-  border-radius: 8px;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-lg);
   background-color: var(--surface-ground);
   border: 2px solid transparent;
-  transition: all 0.3s;
+  transition: all var(--transition-base);
 }
 
 .metric-label {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--text-color);
   opacity: 0.7;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-sm);
 }
 
 .metric-value {
-  font-size: 2rem;
+  font-size: 2rem; /* Оставляем — это осознанный акцент */
   font-weight: bold;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--spacing-xs);
   color: var(--text-color);
 }
 
 .metric-detail {
-  font-size: 1rem;
+  font-size: var(--text-base);
   color: var(--text-color);
   opacity: 0.8;
 }
 
+/* Используем семантические переменные вместо хардкода цветов */
 .severity-success {
-  border-color: #4caf50;
-  background-color: rgba(76, 175, 80, 0.1);
+  border-color: var(--color-success);
+  background-color: var(--color-success-bg);
 }
 .severity-warning {
-  border-color: #ff9800;
-  background-color: rgba(255, 152, 0, 0.1);
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-bg);
 }
 .severity-error {
-  border-color: #f44336;
-  background-color: rgba(244, 67, 54, 0.1);
+  border-color: var(--color-error);
+  background-color: var(--color-error-bg);
 }
 
 .result-assessment {
-  margin-top: 1rem;
+  margin-top: var(--spacing-md);
 }
 </style>

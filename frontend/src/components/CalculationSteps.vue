@@ -44,26 +44,26 @@ defineProps<{
 .steps-container {
   width: 100%;
   background-color: var(--surface-card);
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
-  padding: 1rem;
+  padding: var(--spacing-md);
 }
 
 .table-wrapper {
   width: 100%;
-  overflow-x: auto; /* Горизонтальный скролл на маленьких экранах */
+  overflow-x: auto;
 }
 
 .steps-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
-  min-width: 800px; /* Гарантирует, что колонки не сожмутся слишком сильно */
+  font-size: var(--text-sm);
+  min-width: 800px;
 }
 
 .steps-table th,
 .steps-table td {
-  padding: 0.75rem 1rem;
+  padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
   text-align: left;
   vertical-align: middle;
@@ -85,49 +85,37 @@ defineProps<{
   text-align: center;
 }
 
-/* Контрастные стили для кода формул */
 .formula,
 .expression {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  border-radius: 4px;
+  font-size: var(--text-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
   display: inline-block;
-  white-space: nowrap; /* Запрещаем перенос строк внутри формулы */
+  white-space: nowrap;
 }
 
-/* Светлая тема */
-:root:not(.dark-mode) .formula {
-  background-color: #e9ecef;
-  color: #212529;
-}
-:root:not(.dark-mode) .expression {
-  background-color: #f8f9fa;
-  color: #495057;
-  border: 1px solid #dee2e6;
+.formula {
+  background-color: var(--formula-bg);
+  color: var(--formula-text);
 }
 
-/* Тёмная тема */
-:root.dark-mode .formula {
-  background-color: #2d2d30;
-  color: #e0e0e0;
-}
-:root.dark-mode .expression {
-  background-color: #1e1e1e;
-  color: #b0b0b0;
-  border: 1px solid #333333;
+.expression {
+  background-color: var(--expression-bg);
+  color: var(--expression-text);
+  border: 1px solid var(--expression-border);
 }
 
 .result-value {
-  font-size: 1.05rem;
+  font-size: var(--text-base);
   color: var(--text-color);
 }
 
 .unit {
-  margin-left: 6px;
+  margin-left: var(--spacing-sm);
   color: var(--text-color);
   opacity: 0.6;
   font-weight: normal;
-  font-size: 0.85rem;
+  font-size: var(--text-xs);
 }
 </style>

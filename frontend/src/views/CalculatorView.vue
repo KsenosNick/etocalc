@@ -69,13 +69,13 @@ async function handleCalculate(request: VoltageDropRequest) {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 .calculator-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 @media (min-width: 992px) {
@@ -91,15 +91,15 @@ async function handleCalculate(request: VoltageDropRequest) {
 
 .full-width-steps {
   width: 100%;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn var(--transition-slow) ease-in-out;
 }
 
 .steps-title {
-  margin: 0 0 1rem 0;
-  font-size: 1.25rem;
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--text-xl);
   color: var(--text-color);
   border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: var(--spacing-sm);
 }
 
 @keyframes fadeIn {
