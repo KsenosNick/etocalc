@@ -15,7 +15,7 @@
     >
       <template #option="slotProps">
         <div class="cable-option">
-          <strong>{{ slotProps.option.cableType.name }}</strong>
+          <strong>{{ slotProps.option.cableTypeName }}</strong>
           <span class="cable-specs">
             {{ slotProps.option.conductorCount }}×{{ slotProps.option.crossSection }} мм²,
             {{ slotProps.option.nominalVoltage }}В
@@ -29,32 +29,34 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Select from 'primevue/select'
-import { fetchCables } from '../api/cables'
 import type { Cable } from '../types'
+import { getCables } from '../api/catalog'
 
 const emit = defineEmits<{
   (e: 'select', cable: Cable | null): void
 }>()
 
-const cables = ref<(Cable & { fullName: string })[]>([])
-const selectedCable = ref<(Cable & { fullName: string }) | null>(null)
+const cables = ref<Cable[]>([])
+const selectedCable = ref<Cable | null>(null)
 const loading = ref(true)
 
 onMounted(async () => {
+  loading.value = true
   try {
-    const data = await fetchCables()
-    cables.value = data.map((cable) => ({
-      ...cable,
-      fullName: `${cable.cableType.name} ${cable.conductorCount}×${cable.crossSection} мм²`,
-    }))
+    const page = await getCables({}, 0, 1000, [
+      'cableType.name,asc',
+      'conductorCount,asc',
+      'crossSection,asc',
+    ])
+    cables.value = page.content
   } catch (error) {
-    console.error('Ошибка загрузки каталога:', error)
+    console.error('Ошибка загрузки кабелей:', error)
   } finally {
     loading.value = false
   }
 })
 
-function handleSelect(cable: (Cable & { fullName: string }) | null) {
+function handleSelect(cable: Cable | null) {
   emit('select', cable)
 }
 </script>

@@ -54,3 +54,94 @@ export interface VoltageDropResponse {
   targetVoltage: number
   steps: CalculationStep[]
 }
+
+// === КАТАЛОГ КАБЕЛЕЙ ===
+
+export interface CableType {
+  id: number
+  name: string
+  conductorMaterialName: string
+  insulationMaterialName: string
+  sheathMaterialName: string
+  hasArmor: boolean
+}
+
+export interface Cable {
+  id: number
+  cableTypeId: number
+  cableTypeName: string
+  conductorMaterialName: string
+  nominalVoltage: number
+  conductorCount: number
+  crossSection: number
+  rPhActive: number
+  r0PhActive: number
+  xPhReactive: number
+  x0Reactive: number
+  maxCurrentEarth: number
+  maxCurrentAir: number
+  fullName: string
+}
+
+export interface CableRequest {
+  cableTypeId: number
+  nominalVoltage: number
+  conductorCount: number
+  crossSection: number
+  rPhActive: number
+  r0PhActive: number
+  xPhReactive: number
+  x0Reactive: number
+  maxCurrentEarth: number
+  maxCurrentAir: number
+}
+
+export interface CableExport {
+  cableTypeName: string
+  nominalVoltage: number
+  conductorCount: number
+  crossSection: number
+  rPhActive: number
+  r0PhActive: number
+  xPhReactive: number
+  x0Reactive: number
+  maxCurrentEarth: number
+  maxCurrentAir: number
+}
+
+export interface ExportFile<T> {
+  entityType: string
+  formatVersion: number
+  exportedAt: string
+  items: T[]
+}
+
+export interface ImportResult {
+  created: number
+  updated: number
+  skipped: number
+  failed: number
+  errors: string[]
+}
+
+export enum ImportMode {
+  SKIP = 'SKIP',
+  UPDATE = 'UPDATE',
+  DUPLICATE = 'DUPLICATE',
+}
+
+export interface PageResponse<T> {
+  content: T[]
+  pageNumber: number
+  pageSize: number
+  totalElements: number
+  totalPages: number
+  last: boolean
+}
+
+export interface CableFilter {
+  cableTypeName?: string
+  conductorCount?: number
+  minCrossSection?: number
+  maxCrossSection?: number
+}

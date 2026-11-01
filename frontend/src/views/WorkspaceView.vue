@@ -3,25 +3,21 @@
     <Tabs v-model:value="activeTab" class="ribbon-tabs">
       <TabList>
         <Tab value="home">
-          <!-- Иконка: Однолинейная схема (как на странице "Построитель схем") -->
           <IconHome />
           <span>Главная</span>
         </Tab>
 
         <Tab value="voltage-drop">
-          <!-- Иконка: Кабель с ΔU (крупнее) -->
           <IconVoltageDrop />
           <span>Падение напряжения</span>
         </Tab>
 
         <Tab value="short-circuit">
-          <!-- Иконка: ТКЗ (молния, растянутая по высоте) -->
           <IconShortCircuite />
           <span>ТКЗ</span>
         </Tab>
 
         <Tab value="catalog">
-          <!-- Иконка: Справочники (База данных) -->
           <IconCatalog />
           <span>База данных</span>
         </Tab>
@@ -41,7 +37,7 @@
           </div>
         </TabPanel>
 
-        <!-- Вкладка: Падение напряжения (наш текущий калькулятор) -->
+        <!-- Вкладка: Падение напряжения -->
         <TabPanel value="voltage-drop">
           <CalculatorView />
         </TabPanel>
@@ -58,16 +54,9 @@
           </div>
         </TabPanel>
 
-        <!-- Вкладка: Справочники (заглушка) -->
+        <!-- Вкладка: База данных (CRUD каталога) -->
         <TabPanel value="catalog">
-          <div class="placeholder-panel">
-            <i
-              class="pi pi-database"
-              style="font-size: 4rem; margin-bottom: 1rem; color: var(--text-color); opacity: 0.5"
-            ></i>
-            <h3>Управление справочниками</h3>
-            <p>Редактирование каталога кабелей, материалов и параметров сетей.</p>
-          </div>
+          <CatalogManager />
         </TabPanel>
       </TabPanels>
     </Tabs>
@@ -82,12 +71,13 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import CalculatorView from './CalculatorView.vue'
-import IconShortCircuite from '@/icons/IconShortCircuite.vue'
-import IconVoltageDrop from '@/icons/IconVoltageDrop.vue'
+import CatalogManager from '../components/CatalogManager.vue'
 import IconHome from '@/icons/IconHome.vue'
+import IconVoltageDrop from '@/icons/IconVoltageDrop.vue'
+import IconShortCircuite from '@/icons/IconShortCircuite.vue'
 import IconCatalog from '@/icons/IconCatalog.vue'
 
-const activeTab = ref('voltage-drop') // По умолчанию открываем рабочий калькулятор
+const activeTab = ref('voltage-drop')
 </script>
 
 <style scoped>
