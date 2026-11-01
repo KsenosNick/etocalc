@@ -28,7 +28,7 @@ export async function getCables(
     searchParams.append('sort', s)
   }
 
-  if (filter.cableTypeName) searchParams.set('cableTypeName', filter.cableTypeName)
+  if (filter.search) searchParams.set('search', filter.search)
   if (filter.conductorCount !== undefined) {
     searchParams.set('conductorCount', String(filter.conductorCount))
   }

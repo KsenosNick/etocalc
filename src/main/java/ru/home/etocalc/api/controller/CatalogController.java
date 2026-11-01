@@ -23,13 +23,13 @@ public class CatalogController {
 
     @GetMapping
     public PageResponse<CableResponse> getCables(
-            @RequestParam(required = false) String cableTypeName,
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) Integer conductorCount,
             @RequestParam(required = false) String minCrossSection,
             @RequestParam(required = false) String maxCrossSection,
             @PageableDefault(size = 50, sort = "nominalVoltage") Pageable pageable) {
 
-        return catalogService.getCables(cableTypeName, conductorCount, minCrossSection, maxCrossSection, pageable);
+        return catalogService.getCables(search, conductorCount, minCrossSection, maxCrossSection, pageable);
     }
 
     @GetMapping("/{id}")

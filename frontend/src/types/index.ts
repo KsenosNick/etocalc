@@ -140,7 +140,7 @@ export interface PageResponse<T> {
 }
 
 export interface CableFilter {
-  cableTypeName?: string
+  search?: string
   conductorCount?: number
   minCrossSection?: number
   maxCrossSection?: number

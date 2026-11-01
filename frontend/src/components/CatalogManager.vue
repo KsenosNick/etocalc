@@ -3,8 +3,8 @@
     <div class="toolbar">
       <div class="search-bar">
         <InputText
-          v-model="filter.cableTypeName"
-          placeholder="Поиск по типу кабеля..."
+          v-model="filter.search"
+          placeholder="Поиск: ВВГ, 3х1.5, 660..."
           class="w-full"
           @keyup.enter="loadCables"
         />
@@ -144,7 +144,7 @@ const pageSize = ref(50)
 const currentPage = ref(0)
 
 const filter = ref<CableFilter>({
-  cableTypeName: '',
+  search: '',
 })
 
 const selectedCables = ref<Cable[]>([])

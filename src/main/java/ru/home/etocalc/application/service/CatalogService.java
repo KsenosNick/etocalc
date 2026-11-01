@@ -1,5 +1,6 @@
 package ru.home.etocalc.application.service;
 
+import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,22 +28,58 @@ public class CatalogService {
     private final CableTypeRepository cableTypeRepository;
 
     // 1. Чтение с фильтрацией и сортировкой
-    @Transactional(readOnly = true) // <-- КРИТИЧЕСКИ ВАЖНО: держит сессию открытой для маппинга
-    public PageResponse<CableResponse> getCables(String cableTypeName, Integer conductorCount,
-                                                 String minCrossSection, String maxCrossSection, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public PageResponse<CableResponse> getCables(String search, Integer conductorCount,
+                                                 String minCrossSection, String maxCrossSection,
+                                                 Pageable pageable) {
+        Specification<Cable> spec = Specification.where(null);
 
-        Specification<Cable> spec = Specification.where(CableSpecification.hasCableTypeName(cableTypeName))
-                .and(CableSpecification.hasConductorCount(conductorCount))
-                .and(CableSpecification.hasCrossSectionBetween(
-                        minCrossSection != null ? new BigDecimal(minCrossSection) : null,
-                        maxCrossSection != null ? new BigDecimal(maxCrossSection) : null
-                ));
+        if (search != null && !search.isBlank()) {
+            String normalized = normalizeSearch(search);
+            spec = spec.and((root, query, cb) -> {
+                Expression<String> typeName = cb.lower(root.get("cableType").get("name"));
+                Expression<String> cores = root.get("conductorCount").as(String.class);
+                Expression<String> section = root.get("crossSection").as(String.class);
+
+                // Собираем строку вида "ввгнг(а)-ls 3×1.50"
+                Expression<String> full = cb.concat(
+                        cb.concat(typeName, " "),
+                        cb.concat(cores, cb.concat("×", section))
+                );
+                // Убираем пробелы, чтобы "ввг3х1.5" тоже находило
+                Expression<String> noSpaces = cb.function(
+                        "replace", String.class, full, cb.literal(" "), cb.literal(""));
+
+                return cb.like(noSpaces, "%" + normalized + "%");
+            });
+        }
+
+        if (conductorCount != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("conductorCount"), conductorCount));
+        }
+        if (minCrossSection != null && !minCrossSection.isBlank()) {
+            BigDecimal min = new BigDecimal(minCrossSection);
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("crossSection"), min));
+        }
+        if (maxCrossSection != null && !maxCrossSection.isBlank()) {
+            BigDecimal max = new BigDecimal(maxCrossSection);
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("crossSection"), max));
+        }
 
         Page<Cable> page = cableRepository.findAll(spec, pageable);
-
-        // Маппинг происходит ЗДЕСЬ, внутри @Transactional метода.
-        // Даже если данные ленивые, они загрузятся без ошибок.
         return PageResponse.from(page, CableResponse::from);
+    }
+
+    /** Приводит запрос к единому виду: х/x/× → ×, без пробелов, нижний регистр */
+    private String normalizeSearch(String raw) {
+        return raw.trim()
+                .replace('х', '×')  // кириллическая х
+                .replace('x', '×')  // латинская x
+                .replace(" ", "")
+                .toLowerCase();
     }
 
     // 2. Чтение одного элемента
